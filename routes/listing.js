@@ -5,16 +5,22 @@ const ExpressError = require("../utils/ExpressError.js");
 const { listingSchema } = require("../schema.js");
 const Listing = require("../models/listing.js");
 const { isLoggedIn, isOwner, validateListing } = require("../middlware.js");
-
 const listingController = require("../controllers/listings.js");
+const multer = require("multer");
+const {storage} = require("../cloudConfig.js");
+const upload = multer({ storage });
+
 
 router.route("/") 
 .get(wrapAsync(listingController.index))
-.post(
-  isLoggedIn,
-  validateListing,
-  wrapAsync(listingController.createListing)
-);
+// .post(
+//   isLoggedIn,
+//   validateListing,
+//   wrapAsync(listingController.createListing)
+// );
+.post(upload.single('listing[image]'), (req, res) => {
+  res.send(req.file);
+});
 
 //new route
 router.get("/new", isLoggedIn, listingController.renderNewForm);
